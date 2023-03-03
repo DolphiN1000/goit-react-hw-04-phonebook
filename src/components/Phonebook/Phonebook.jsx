@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 
 import '../../shared/styles/styles.scss';
@@ -10,16 +10,23 @@ import ContactsList from './ContactList/ContactList';
 import styles from './phonebook.module.scss';
 
 const Phonebook = () => {
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState(() => {
+    const contacts = JSON.parse(localStorage.getItem('my-contacts'));
+    return contacts ? contacts : [];
+  });
   const [filter, setFilter] = useState('');
 
+  useEffect(() => {
+    localStorage.setItem('my-contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
   const isDulicate = (name, number) => {
-    const normalizedName = name.toLocaleLowerCase();
-    const normalizedNumber = number.toLocaleLowerCase();
+    const normalizedName = name.toLowerCase();
+    const normalizedNumber = number.toLowerCase();
     const result = contacts.find(({ name, number }) => {
       return (
-        name.toLocaleLowerCase() === normalizedName ||
-        number.toLocaleLowerCase() === normalizedNumber
+        name.toLowerCase() === normalizedName ||
+        number.toLowerCase() === normalizedNumber
       );
     });
     return Boolean(result);
@@ -36,7 +43,7 @@ const Phonebook = () => {
         name,
         number,
       };
-      return { newContact, ...prevContacts };
+      return [newContact, ...prevContacts];
     });
     return true;
   };
@@ -54,26 +61,18 @@ const Phonebook = () => {
       return contacts;
     }
 
-    const normalizedFilter = filter.toLocaleLowerCase();
+    const normalizedFilter = filter.toLowerCase();
     const finded = contacts.filter(({ name, number }) => {
       return (
-        name.toLocaleLowerCase().includes(normalizedFilter) ||
-        number.toLocaleLowerCase().includes(normalizedFilter)
+        name.toLowerCase().includes(normalizedFilter) ||
+        number.toLowerCase().includes(normalizedFilter)
       );
     });
     return finded;
   };
 
   const filteredContacts = getFilteredContacts();
-  // .sort(function (a, b) {
-  //         if (a.name > b.name) {
-  //           return 1;
-  //         }
-  //         if (a.name < b.name) {
-  //           return -1;
-  //         }
-  //         return 0;
-  //       });
+
   const isContacts = Boolean(filteredContacts.length);
 
   return (

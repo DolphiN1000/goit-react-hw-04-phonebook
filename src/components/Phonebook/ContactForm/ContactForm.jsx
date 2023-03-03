@@ -6,23 +6,24 @@ import initialState from './initialState';
 import styles from './contactForm.module.scss';
 
 const ContactsForm = ({ onSubmit }) => {
-  const [state, setState] = useState({ ...initialState });
+  const [contact, setContact] = useState({ ...initialState });
 
   const handleChange = ({ target }) => {
     const { name, value } = target;
-    setState(prevState => {
-      return { ...prevState, [name]: value };
+    setContact(prevContact => {
+      return { ...prevContact, [name]: value };
     });
   };
 
   const handleSubmit = event => {
     event.preventDefault();
-    const result =  onSubmit({ name, number });
-    if (result)
-    {setState({ ...initialState })}
+    const result = onSubmit({ ...contact });
+    if (result) {
+      setContact({ ...initialState });
+    }
   };
 
-  const { name, number } = state;
+  const { name, number } = contact;
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
